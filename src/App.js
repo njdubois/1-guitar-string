@@ -5,12 +5,12 @@ import './App.css';
 
 // This is the parent parent parent!
 class App extends Component {
-  
-
   constructor(props) {
     super(props);
     this.state = {
-      currentStrings: ['a'],
+      currentScale: "",
+      currentScaleKey: "a",
+      currentStrings: ['e', 'b', 'g', 'd', 'a', 'e'],
       startFret: 1,
       totalFrets: 18,
       notesInScale: [],
@@ -77,10 +77,10 @@ class App extends Component {
     );
     
     return noteKey;
-  }
+  };
+
   convertKeyToNote = function(testKey) {
     var noteLabel = "?";
-
     this.state.notes.map((note) => {
         if (testKey == note.key) { 
           noteLabel = note.noteLabel; 
@@ -89,7 +89,7 @@ class App extends Component {
     );
     
     return noteLabel;
-  }
+  };
 
   toggleNoteInScale(note) {
     
@@ -105,7 +105,7 @@ class App extends Component {
       currentNotesInScale.push(note);   
     }
 
-    this.setState({noteSInScale: currentNotesInScale});
+    this.setState({notesInScale: currentNotesInScale});
   }
 
   lowerStartFret() {
@@ -166,6 +166,46 @@ class App extends Component {
     this.setState({currrentStrings: currentStrings});
   }
 
+  setScale = (e) => {
+    // if (e.target.value) {
+    //   console.log("here", e.target.value);
+      this.setState({currentScale: e.target.value, notesInScale: []}, () => {
+        this.calcScale();
+      });
+  };
+
+  calcScale = () => {
+    let scale = this.state.currentScale;
+
+console.log("scale : ", scale);
+
+    if (scale) {
+
+
+
+      let scaleItems = scale.split(",");
+
+      let startKey = parseInt(this.convertNoteToKey(this.state.currentScaleKey));
+      this.toggleNoteInScale(this.convertKeyToNote(startKey));
+
+      scaleItems.map((aScaleInc) => {
+        let nextNote = parseInt(startKey) + parseInt(aScaleInc);
+
+        if (nextNote >= 12 ) nextNote = nextNote - 12;
+
+        this.toggleNoteInScale(this.convertKeyToNote(nextNote));
+
+        startKey = nextNote;
+      });
+
+    }
+  };
+
+  changeScaleKey = (e) => {
+    this.setState({currentScaleKey: e.target.value, notesInScale: []}, () => {
+      this.calcScale();
+    });
+  };
 
   render() {
 
@@ -177,6 +217,26 @@ class App extends Component {
       <div className="App">
         <div className="toolBar">
 
+          <div className="toolBarItem">
+            <select value={this.state.currentScaleKey} onChange={this.changeScaleKey}>
+              <option></option>
+              {this.state.notes.map(note => {
+                return (
+                  <option>
+                    {note.noteLabel}
+                  </option>
+                );
+              })}
+            </select>
+            <select onChange={this.setScale} value={this.state.currentScale}>
+              <option value="">Scale</option>
+              <option
+                value="3,2,2,3"
+              >
+                Pentatonic
+              </option>
+            </select>
+          </div>
           <div className="toolBarItem">
             <button onClick={this.lowerStartFret.bind(this)} className="toolBarItemButton">-</button>
             <div className="toolBarItemLabel">Start Fret: {this.state.startFret}</div>
@@ -344,7 +404,6 @@ class AFretBoardLabel extends React.Component {
   getStringLabel = function(fretCount, startFret) {
     var stringNotes = [];
 
-    
     if (startFret < 1) { startFret = 1; }
 
     //add Space for string Menu
