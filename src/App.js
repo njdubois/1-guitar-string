@@ -28,7 +28,30 @@ class App extends Component {
         { key: 10, noteLabel: 'g' },
         { key: 11, noteLabel: 'g#' }
       ],
-      noteCount: 11
+      noteCount: 11,
+      savedScales: [
+        {
+          title: "Pentatonic",
+          scale: "3,2,2,3,2"
+        },
+        {
+          title: "Major",
+          scale: "2,2,1,2,2,2,1"
+        },
+        {
+          title: "Major Pentatonic",
+          scale: "2,2,3,2,3"
+        },
+        {
+          title: "Natural Minor",
+          scale: "2,1,2,2,1,2,2"
+        },
+        {
+          title: "Dorian",
+          scale: "2,1,2,2,2,1,2"
+        }
+      ]
+
     };
   }
 
@@ -92,7 +115,6 @@ class App extends Component {
   };
 
   toggleNoteInScale(note) {
-    
     var index = this.state.notesInScale.indexOf(note);
     var currentNotesInScale = this.state.notesInScale;
 
@@ -167,26 +189,21 @@ class App extends Component {
   }
 
   setScale = (e) => {
-    // if (e.target.value) {
-    //   console.log("here", e.target.value);
       this.setState({currentScale: e.target.value, notesInScale: []}, () => {
         this.calcScale();
       });
   };
 
+  clearScale = () => {
+    this.setState({currentScale: "", notesInScale: []});
+  };
+
   calcScale = () => {
     let scale = this.state.currentScale;
 
-console.log("scale : ", scale);
-
     if (scale) {
-
-
-
       let scaleItems = scale.split(",");
-
       let startKey = parseInt(this.convertNoteToKey(this.state.currentScaleKey));
-      this.toggleNoteInScale(this.convertKeyToNote(startKey));
 
       scaleItems.map((aScaleInc) => {
         let nextNote = parseInt(startKey) + parseInt(aScaleInc);
@@ -230,12 +247,15 @@ console.log("scale : ", scale);
             </select>
             <select onChange={this.setScale} value={this.state.currentScale}>
               <option value="">Scale</option>
-              <option
-                value="3,2,2,3"
-              >
-                Pentatonic
-              </option>
+              {this.state.savedScales.map(aScale => {
+                return (
+                  <option value={aScale.scale}>
+                    {aScale.title}
+                  </option>
+                );
+              })}
             </select>
+            <button onClick={this.clearScale.bind(this)}  className="toolBarItemButton">Clear</button>
           </div>
           <div className="toolBarItem">
             <button onClick={this.lowerStartFret.bind(this)} className="toolBarItemButton">-</button>
