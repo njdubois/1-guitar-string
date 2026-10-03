@@ -74,20 +74,26 @@ h1 {
   font-weight: 600;
 }
 
-.controlField select,
-.stepper,
-.segmentedControl {
+.controlField select {
   height: 38px;
-  border: 1px solid #dce1da;
+  border: 1px solid var(--control-border);
   border-radius: 7px;
   background: #fff;
   color: #252b29;
   font-size: 13px;
+  box-shadow: 0 1px 2px #25332a0a;
 }
 
 .controlField select {
   padding: 0 10px;
   cursor: pointer;
+}
+
+.controlField select:disabled {
+  cursor: default;
+  opacity: 0.45;
+  background: #f0f2ed;
+  box-shadow: none;
 }
 
 .keyField {
@@ -101,32 +107,38 @@ h1 {
 
 .clearButton {
   height: 38px;
-  padding: 0 8px;
-  border: 0;
+  padding: 0 12px;
+  border: 1px solid var(--control-border);
   border-radius: 7px;
-  color: var(--muted);
-  background: transparent;
+  color: var(--accent);
+  background: #fff;
   font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px #25332a0a;
 }
 
 .stepper,
 .segmentedControl {
   display: flex;
   align-items: center;
+  height: 38px;
+  gap: 6px;
 }
 
 .stepper button,
 .segmentedControl button {
   align-self: stretch;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--control-border);
   border-radius: 6px;
-  color: var(--muted);
-  background: transparent;
+  color: var(--accent);
+  background: var(--control-background);
+  font-weight: 600;
+  box-shadow: 0 1px 2px #25332a0a;
 }
 
 .stepper button {
-  width: 30px;
+  width: 32px;
   font-size: 16px;
 }
 
@@ -134,18 +146,14 @@ h1 {
   min-width: 26px;
   padding: 0 3px;
   text-align: center;
+  color: #38443c;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
 .segmentedControl button {
   padding: 0 10px;
   font-size: 12px;
-}
-
-.segmentedControl button + button {
-  border-left: 1px solid var(--border);
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
 }
 
 .boardHeader {
@@ -167,9 +175,96 @@ h1 {
   font-size: 12px;
 }
 
-.fretboard {
-  overflow-x: auto;
+.boardStatus {
+  padding: 0 24px 8px;
+}
+
+.boardReadout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px 32px;
+  margin: 0;
+}
+
+.boardReadout > div + div {
+  padding-left: 24px;
+  border-left: 1px solid var(--border);
+}
+
+.boardReadout dt {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.boardReadout dd {
+  width: fit-content;
+  margin: 0;
+  color: #38443c;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.boardReadout strong {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.boardReadoutKey dd {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.boardReadoutKey strong {
+  color: var(--accent);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.boardReadoutKey span {
+  font-size: 13px;
+}
+
+.boardReadout .boardReadoutDetail {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.boardChangeMessage {
+  min-height: 36px;
+  margin: 14px 0 0;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.readoutChanged {
+  animation: readoutChange 900ms ease-out;
+}
+
+@keyframes readoutChange {
+  0%, 35% { background-color: #f5e6b3; box-shadow: 0 0 0 5px #f5e6b3; }
+  100% { background-color: transparent; box-shadow: 0 0 0 5px transparent; }
+}
+
+.fretboardLayout {
+  display: flex;
+  align-items: flex-start;
   padding: 8px 24px 24px;
+}
+
+.fretboardControls {
+  flex: 0 0 106px;
+  width: 106px;
+}
+
+.fretboard {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
   scrollbar-width: thin;
   scrollbar-color: #cbd3ca transparent;
 }
@@ -180,6 +275,20 @@ h1 {
   width: max-content;
   min-width: 100%;
   height: 48px;
+}
+
+.stringControls {
+  min-width: 0;
+  width: 106px;
+  background: #fff;
+}
+
+.fretboardPanning .stringFretNote {
+  flex: 0 0 var(--fret-width);
+}
+
+.fretboardPanning {
+  overflow-anchor: none;
 }
 
 .aFret {
@@ -203,6 +312,14 @@ h1 {
   height: 30px;
   border-radius: 5px;
   color: var(--muted);
+}
+
+button.stringMenu {
+  flex-basis: 23px;
+  margin-right: 2px;
+  border: 1px solid var(--control-border);
+  color: var(--accent);
+  background: var(--control-background);
 }
 
 .stringLabel {
@@ -233,6 +350,14 @@ h1 {
   background: #fafbf8;
 }
 
+button.aFret[aria-disabled="false"] .noteDot {
+  border: 1px solid #b9c9b8;
+}
+
+button.aFret[aria-disabled="true"] {
+  cursor: default;
+}
+
 .stringLabel .noteDot {
   background: #f0f2ed;
 }
@@ -257,7 +382,7 @@ h1 {
 }
 
 .aFretLabel.fretMarker {
-  color: var(--accent);
+  color: #5c655e;
   font-weight: 700;
 }
 
@@ -283,15 +408,19 @@ h1 {
 }
 
 .selectedNote {
-  min-width: 28px;
-  padding: 5px 8px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  text-align: center;
-  font-size: 11px;
+  padding: 0;
+  color: #38443c;
+  background: transparent;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+.selectedNote + .selectedNote::before {
+  content: '·';
+  margin: 0 8px 0 2px;
+  color: #939b94;
+  font-weight: 400;
 }
 
 .emptySelection,
@@ -303,7 +432,7 @@ h1 {
 }
 
 .emptyBoard {
-  margin: 12px 0 24px;
+  margin: 12px 24px 24px;
 }
 
 .appHint {
@@ -315,17 +444,18 @@ h1 {
   .clearButton:not(:disabled):hover,
   .stepper button:not(:disabled):hover,
   .segmentedControl button:not(:disabled):hover,
-  .stringMenu:hover {
+  button.stringMenu:hover {
     color: var(--accent);
-    background: var(--accent-soft);
+    border-color: var(--accent);
+    background: #e4eee1;
   }
 
-  .noteNotInScale:hover .noteDot {
+  button.noteNotInScale:not([aria-disabled="true"]):hover .noteDot {
     color: var(--accent);
     background: #e3ece2;
   }
 
-  .noteInScale:hover .noteDot {
+  button.noteInScale:not([aria-disabled="true"]):hover .noteDot {
     background: #194f38;
   }
 }
@@ -387,15 +517,40 @@ h1 {
     padding: 22px 16px 12px;
   }
 
-  .fretboard {
+  .boardStatus {
     padding-right: 16px;
     padding-left: 16px;
+  }
+
+  .boardReadout {
+    gap: 16px 20px;
+  }
+
+  .boardReadout > div + div {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .fretboardLayout {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .emptyBoard {
+    margin-right: 16px;
+    margin-left: 16px;
   }
 
   .boardFooter {
     flex-wrap: wrap;
     gap: 10px;
     padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .readoutChanged {
+    animation: none;
   }
 }
 
@@ -417,16 +572,19 @@ h1 {
 .practiceButton {
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   border-radius: 6px;
   color: var(--accent);
-  background: #fff;
+  background: var(--control-background);
   font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px #25332a0a;
 }
 
 .practiceButton[aria-pressed="true"] {
   border-color: var(--accent);
-  background: var(--accent-soft);
+  color: #fff;
+  background: var(--accent);
 }
 
 .practiceHint {
@@ -542,10 +700,11 @@ h1 {
 .tabColumn {
   width: 48px;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--control-border);
   border-radius: 6px;
+  margin-right: 4px;
   color: #252b29;
-  background: transparent;
+  background: #fff;
 }
 
 .tabStepNumber,
@@ -591,6 +750,7 @@ h1 {
 }
 
 .activeTabColumn {
+  border-color: var(--accent);
   background: #e6eee3;
 }
 
@@ -623,7 +783,12 @@ h1 {
 @media (hover: hover) {
   .practiceButton:not(:disabled):hover,
   .tabColumn:hover {
-    background-color: var(--accent-soft);
+    border-color: var(--accent);
+    background-color: #e4eee1;
+  }
+
+  .practiceButton[aria-pressed="true"]:hover {
+    background-color: #194f38;
   }
 
   .activeRunNote:hover .noteDot {
@@ -636,5 +801,373 @@ h1 {
   .runPractice {
     padding-right: 16px;
     padding-left: 16px;
+  }
+}
+
+.viewSwitcher {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #ebeee8;
+}
+
+.viewSwitcher button {
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  color: var(--accent);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.viewSwitcher button[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 1px 3px #25332a12;
+  font-weight: 600;
+}
+
+.cagedLesson {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  background: #fafbf8;
+}
+
+.cagedIntro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px 40px;
+}
+
+.cagedIntro h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.cagedIntro p:not(.brand),
+.cagedTuningNotice p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.cagedIntro strong {
+  color: #252b29;
+  font-weight: 600;
+}
+
+.cagedExplanation {
+  padding: 14px 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.cagedExplanation summary {
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cagedExplanation[open] summary {
+  margin-bottom: 12px;
+}
+
+.cagedExplanation a {
+  color: var(--accent);
+  font-size: 11px;
+  text-underline-offset: 3px;
+}
+
+.cagedShapeButtons {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.cagedShapeButtons button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 72px;
+  min-height: 64px;
+  gap: 5px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  color: var(--accent);
+  background: var(--control-background);
+  box-shadow: 0 1px 2px #25332a0a;
+}
+
+.cagedShapeButtons strong {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.cagedShapeButtons span {
+  font-size: 10px;
+}
+
+.cagedShapeButtons button[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: #fff;
+  background: var(--accent);
+}
+
+.cagedShapeHeading,
+.cagedOptions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.cagedShapeHeading h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cagedShapeHeading p,
+.cagedConnection {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cagedOptions {
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.cagedOptions label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #38443c;
+  font-size: 12px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.cagedOptions input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.cagedConnection {
+  margin: 10px 0 16px;
+}
+
+.cagedTuningNotice {
+  margin-top: 16px;
+}
+
+.chordCell[aria-disabled="true"] {
+  cursor: default;
+}
+
+.diagramChordTone .noteDot {
+  flex-direction: column;
+  gap: 1px;
+  width: 34px;
+  height: 34px;
+  line-height: 1.1;
+}
+
+.chordNoteName {
+  font-size: 11px;
+}
+
+.chordInterval {
+  font-size: 9px;
+  opacity: 0.85;
+}
+
+.chordCell.noteNotInScale .noteDot {
+  color: var(--accent);
+  background: #e8efe3;
+}
+
+.activeChordNote .noteDot {
+  box-shadow: 0 0 0 6px #27664c22;
+}
+
+@media (max-width: 760px) {
+  .cagedIntro {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .boardHeader {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .cagedLesson {
+    padding: 20px 16px;
+  }
+
+  .viewSwitcher button {
+    padding: 0 12px;
+  }
+}
+
+.triadExplorer {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  background: #fafbf8;
+}
+
+.triadIntro h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.triadIntro p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.triadControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 22px 0;
+}
+
+.triadControls .controlField {
+  min-width: 140px;
+}
+
+.triadSummary h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.triadSummary p {
+  margin: 8px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.triadNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.triadToneList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 12px 24px;
+  margin: 24px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.triadToneList > li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.triadToneList strong {
+  color: #38443c;
+}
+
+.triadDegree {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.triadExplanation {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.triadExplanation summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--accent);
+  padding: 8px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  background: #fff;
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .viewSwitcher button:not([aria-pressed="true"]):hover,
+  .cagedShapeButtons button:not([aria-pressed="true"]):hover,
+  .controlField select:not(:disabled):hover,
+  .triadExplanation summary:hover {
+    border-color: var(--accent);
+    background-color: #e4eee1;
+  }
+}
+
+.triadExplanation p {
+  max-width: 640px;
+}
+
+.triadExplanation a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .viewSwitcher {
+    flex-wrap: wrap;
+  }
+
+  .viewSwitcher button {
+    font-size: 12px;
+    padding: 0 10px;
+  }
+
+  .triadExplorer {
+    padding: 20px 16px;
+  }
+
+  .triadControls {
+    gap: 12px;
+  }
+
+  .triadControls .controlField {
+    flex: 1 1 140px;
   }
 }

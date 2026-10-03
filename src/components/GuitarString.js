@@ -5,6 +5,7 @@ import { positionKey } from '../runs';
 export default function GuitarString({
   string, stringNumber, frets, notesInScale, rootNote, onNoteToggle, onTuningChange,
   practicing, steps, activeStep, startKey, onRootPick, onStepChange,
+  chordDiagram, chordNoteKey, onChordNotePick, visibleStart, visibleEnd, controls = false,
 }) {
   const renderNote = fret => {
     const pitch = string.pitch + fret;
@@ -12,18 +13,25 @@ export default function GuitarString({
     const position = { stringId: string.id, stringIndex: stringNumber - 1, fret, pitch, note };
     const key = positionKey(position);
     const root = note === rootNote;
-    const selected = notesInScale.includes(note);
+    const chordTone = chordDiagram && chordDiagram.tones.find(tone => tone.stringIndex === stringNumber - 1 && tone.fret === fret);
+    const scaleContext = chordDiagram && chordDiagram.showScale && chordDiagram.pentatonicNotes.includes(note) && fret >= Math.max(0, chordDiagram.minFret - 1) && fret <= chordDiagram.maxFret + 1;
+    const mutedString = chordDiagram && !chordDiagram.showScale && fret === 0 && !chordDiagram.tones.some(tone => tone.stringIndex === stringNumber - 1);
+    const selected = chordDiagram ? Boolean(chordTone) : notesInScale.includes(note);
     const stepIndex = steps.findIndex(step => positionKey(step) === key);
     const active = practicing && stepIndex >= 0 && stepIndex === activeStep;
-    const showNote = !practicing || !steps.length || stepIndex >= 0;
-    const interactive = !practicing || (steps.length ? stepIndex >= 0 : root);
+    const showNote = chordDiagram ? Boolean(chordTone || scaleContext) : !practicing || !steps.length || stepIndex >= 0;
+    const inWindow = fret === 0 || (fret >= visibleStart && fret <= visibleEnd);
+    const interactive = inWindow && (chordDiagram ? showNote : !practicing || (steps.length ? stepIndex >= 0 : root));
     const classes = [
       'aFret', fret === 0 ? 'stringLabel' : 'stringFretNote',
       selected ? 'noteInScale' : 'noteNotInScale',
-      root && (selected || practicing) ? 'rootNote' : '',
+      root && (selected || practicing || (chordDiagram && showNote)) ? 'rootNote' : '',
       practicing && !steps.length && key === startKey ? 'chosenRoot' : '',
       practicing && !steps.length && !root ? 'runContextNote' : '',
       active ? 'activeRunNote' : '',
+      chordDiagram ? 'chordCell' : '',
+      chordTone ? 'diagramChordTone' : '',
+      chordDiagram && key === chordNoteKey ? 'activeChordNote' : '',
     ].join(' ');
 
     return (
@@ -32,18 +40,26 @@ export default function GuitarString({
         type="button"
         className={classes}
         data-run-current={active ? 'true' : undefined}
-        aria-label={`String ${stringNumber}, ${fret === 0 ? 'open' : `fret ${fret}`}${showNote ? `, ${pitchLabel(pitch)}${root ? ', root' : ''}` : ''}${stepIndex >= 0 ? `, step ${stepIndex + 1}` : ''}`}
-        aria-pressed={practicing ? active || (!steps.length && key === startKey) : selected}
+        aria-label={mutedString ? `String ${stringNumber}, omitted from chord` : `String ${stringNumber}, ${fret === 0 ? 'open' : `fret ${fret}`}${showNote ? `, ${chordTone && chordTone.label ? chordTone.label : pitchLabel(pitch)}${root ? ', root' : ''}` : ''}${chordTone ? `, chord tone ${chordTone.degree}` : ''}${stepIndex >= 0 ? `, step ${stepIndex + 1}` : ''}`}
+        aria-pressed={chordDiagram ? key === chordNoteKey : practicing ? active || (!steps.length && key === startKey) : selected}
         aria-disabled={!interactive}
         tabIndex={interactive ? 0 : -1}
         onClick={() => {
-          if (!practicing) onNoteToggle(note);
+          if (!interactive) return;
+          if (chordDiagram) {
+            onChordNotePick(position);
+          } else if (!practicing) onNoteToggle(note);
           else if (steps.length && stepIndex >= 0) onStepChange(stepIndex);
           else if (!steps.length && root) onRootPick(position);
         }}
       >
-        <span className={`noteDot${showNote ? '' : ' hiddenNote'}`} aria-hidden={!showNote}>
-          {showNote ? note : ''}
+        <span className={`noteDot${showNote || mutedString ? '' : ' hiddenNote'}`} aria-hidden={!showNote}>
+          {mutedString ? '×' : showNote ? chordTone ? (
+            <React.Fragment>
+              <span className="chordNoteName">{chordTone.label || note}</span>
+              <span className="chordInterval">{chordTone.degree}</span>
+            </React.Fragment>
+          ) : note : ''}
           {practicing && stepIndex >= 0 && <span className="runOrder" aria-hidden="true">{stepIndex + 1}</span>}
         </span>
       </button>
@@ -51,15 +67,16 @@ export default function GuitarString({
   };
 
   return (
-    <div className="aFretBoardString" role="group" aria-label={`String ${stringNumber}, tuned to ${pitchLabel(string.pitch)}`}>
-      <button type="button" className="aFret stringMenu" aria-label={`Lower string ${stringNumber} tuning by one semitone`} onClick={() => onTuningChange(string.id, -1)}>
-        <span aria-hidden="true">←</span>
-      </button>
-      <button type="button" className="aFret stringMenu" aria-label={`Raise string ${stringNumber} tuning by one semitone`} onClick={() => onTuningChange(string.id, 1)}>
-        <span aria-hidden="true">→</span>
-      </button>
-      {renderNote(0)}
-      {frets.map(renderNote)}
+    <div className={`aFretBoardString${controls ? ' stringControls' : ''}`} role="group" aria-label={`String ${stringNumber}, ${controls ? 'tuning and open note' : 'fretted notes'}, tuned to ${pitchLabel(string.pitch)}`}>
+      {controls ? <React.Fragment>
+        <button type="button" className="aFret stringMenu" aria-label={`Lower string ${stringNumber} tuning by one semitone`} onClick={() => onTuningChange(string.id, -1)}>
+          <span aria-hidden="true">←</span>
+        </button>
+        <button type="button" className="aFret stringMenu" aria-label={`Raise string ${stringNumber} tuning by one semitone`} onClick={() => onTuningChange(string.id, 1)}>
+          <span aria-hidden="true">→</span>
+        </button>
+        {renderNote(0)}
+      </React.Fragment> : frets.map(renderNote)}
     </div>
   );
 }

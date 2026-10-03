@@ -9,6 +9,8 @@
   --border: #e2e6e0;
   --accent: #27664c;
   --accent-soft: #edf4ee;
+  --control-border: #aabdad;
+  --control-background: #f2f7f1;
 }
 
 * {
@@ -36,6 +38,8 @@ button:disabled {
 
 button:focus-visible,
 select:focus-visible,
+summary:focus-visible,
+input:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;

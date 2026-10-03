@@ -30,6 +30,7 @@ export default function Toolbar({
   currentScale, currentScaleKey, startFret, totalFrets, hasStrings, hasSelectedNotes,
   onScaleChange, onKeyChange, onClear, onStartFretChange, onTotalFretsChange,
   onAddString, onRemoveString,
+  lessonMode,
 }) {
   return (
     <div className="toolbar" role="group" aria-label="Fretboard controls">
@@ -40,7 +41,7 @@ export default function Toolbar({
             {NOTES.map(note => <option key={note} value={note}>{note.toUpperCase()}</option>)}
           </select>
         </label>
-        <label className="controlField scaleField">
+        {!lessonMode && <React.Fragment><label className="controlField scaleField">
           <span className="controlLabel">Scale</span>
           <select value={currentScale} onChange={event => onScaleChange(event.target.value)}>
             <option value="">{hasSelectedNotes && !currentScale ? 'Custom scale' : 'Choose a scale'}</option>
@@ -48,6 +49,7 @@ export default function Toolbar({
           </select>
         </label>
         <button type="button" onClick={onClear} className="clearButton" disabled={!hasSelectedNotes && !currentScale}>Clear</button>
+        </React.Fragment>}
       </div>
       <div className="neckControls">
         <Stepper label="Start fret" value={startFret} onChange={onStartFretChange} />
