@@ -1149,7 +1149,307 @@ button.aFret[aria-disabled="true"] {
   text-underline-offset: 3px;
 }
 
+.quizSettings {
+  border-bottom: 1px solid var(--border);
+  background: #fafbf8;
+}
+
+.quizSettings summary {
+  padding: 14px 24px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quizSettings summary span {
+  margin-left: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.quizSettings .toolbar {
+  justify-content: flex-start;
+  border-bottom: 0;
+  padding-top: 8px;
+}
+
+.quizHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 24px 24px 12px;
+}
+
+.quizHeader h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.quizHeader p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.quizHeader .quizScore {
+  flex-shrink: 0;
+  padding-top: 4px;
+  text-align: right;
+  font-size: 12px;
+}
+
+.quizScore strong {
+  display: block;
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.quizLocation {
+  margin: 0;
+  padding: 0 24px 8px;
+  color: #38443c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quizFretboard .stringLabel .noteDot {
+  background: #fafbf8;
+}
+
+.quizFretboard .quizTarget .noteDot {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 5px #27664c18;
+}
+
+.quizFretboard .quizTargetCorrect .noteDot {
+  color: #fff;
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.quizFretboard .quizTargetWrong .noteDot {
+  color: #fff;
+  border-color: #b4423a;
+  background: #b4423a;
+  box-shadow: 0 0 0 5px #b4423a18;
+}
+
+.quizAnswers {
+  padding: 20px 24px 16px;
+  border-top: 1px solid var(--border);
+  background: #fafbf8;
+}
+
+.quizOptions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.quizAnswer {
+  min-height: 60px;
+  padding: 8px;
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  color: var(--accent);
+  background: #fff;
+  font-size: 23px;
+  font-weight: 650;
+  touch-action: manipulation;
+}
+
+.quizAnswerCorrect {
+  border-color: var(--accent);
+  color: #fff;
+  background: var(--accent);
+}
+
+.quizAnswerWrong {
+  border-color: #b4423a;
+  color: #fff;
+  background: #b4423a;
+}
+
+.quizFeedback {
+  min-height: 20px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.quizFeedbackCorrect {
+  color: var(--accent);
+}
+
+.quizFeedbackWrong {
+  color: #b4423a;
+}
+
+@media (hover: hover) {
+  .quizAnswer:not([aria-disabled="true"]):hover {
+    border-color: var(--accent);
+    background: #e4eee1;
+  }
+}
+
 @media (max-width: 640px) {
+  .noteGameApp {
+    padding: 12px 12px 24px;
+  }
+
+  .noteGameApp .appHeader {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .noteGameApp .brand {
+    margin: 0;
+    font-size: 9px;
+  }
+
+  .noteGameApp h1 {
+    margin-bottom: 0;
+    font-size: 24px;
+  }
+
+  .noteGameApp .appDescription {
+    display: none;
+  }
+
+  .noteGameApp .viewSwitcher {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 12px;
+  }
+
+  .noteGameApp .viewSwitcher button {
+    min-height: 44px;
+    padding: 4px;
+    font-size: 11px;
+  }
+
+  .quizSettings summary {
+    min-height: 44px;
+    padding: 14px 12px;
+  }
+
+  .quizSettings summary span {
+    margin-left: 6px;
+    font-size: 10px;
+  }
+
+  .quizSettings button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .quizSettings .stepper,
+  .quizSettings .segmentedControl {
+    height: 44px;
+  }
+
+  .quizHeader {
+    gap: 12px;
+    padding: 12px 12px 10px;
+  }
+
+  .quizHeader h2 {
+    margin-bottom: 6px;
+    font-size: 20px;
+  }
+
+  .quizHeader p {
+    font-size: 12px;
+  }
+
+  .quizScore strong {
+    font-size: 18px;
+  }
+
+  .quizLocation {
+    padding: 0 12px 4px;
+  }
+
+  .quizFretboard {
+    padding: 4px 12px 12px;
+  }
+
+  .quizFretboard .aFretBoardString,
+  .quizFretboard .aFret {
+    height: 36px;
+  }
+
+  .quizFretboard .fretLabels,
+  .quizFretboard .aFretLabel {
+    height: 24px;
+  }
+
+  .quizFretboard .fretboardControls,
+  .quizFretboard .stringControls {
+    flex-basis: 38px;
+    width: 38px;
+  }
+
+  .quizFretboard .stringMenu {
+    display: none;
+  }
+
+  .quizFretboard .stringLabel {
+    position: relative;
+    flex-basis: 32px;
+    margin-right: 6px;
+  }
+
+  .quizFretboard .quizCell.stringLabel::before {
+    content: attr(data-string-number);
+    position: absolute;
+    left: -7px;
+    color: var(--muted);
+    font-size: 9px;
+  }
+
+  .quizAnswers {
+    padding: 10px 12px;
+  }
+
+  .quizOptions {
+    gap: 8px;
+  }
+
+  .quizAnswer {
+    min-height: 60px;
+    font-size: 22px;
+  }
+
+  .quizFeedback {
+    margin-top: 8px;
+  }
+
+  .noteGameApp .appHint {
+    margin-top: 12px;
+    font-size: 11px;
+  }
+
   .viewSwitcher {
     flex-wrap: wrap;
   }

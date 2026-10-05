@@ -4,6 +4,7 @@ import FretboardStatus from './components/FretboardStatus';
 import Toolbar from './components/Toolbar';
 import CagedLesson from './components/CagedLesson';
 import TriadExplorer from './components/TriadExplorer';
+import NoteQuiz from './components/NoteQuiz';
 import { getTriadSelection, INVERSIONS, triadDefinition } from './triads';
 import { adjacentShape, getCagedShape, isStandardTuning, STANDARD_TUNING } from './caged';
 import { NOTES, SCALES, getScaleNotes, noteAtPitch } from './music';
@@ -207,6 +208,7 @@ class App extends Component {
     const { viewMode, cagedShape, cagedOctave, cagedShowScale } = this.state;
     const learningCaged = viewMode === 'caged';
     const viewingTriads = viewMode === 'triads';
+    const playingNoteGame = viewMode === 'quiz';
     const chordMode = learningCaged || viewingTriads;
     const standardTuning = isStandardTuning(currentStrings);
     const shape = getCagedShape(currentScaleKey, cagedShape, cagedOctave);
@@ -217,36 +219,46 @@ class App extends Component {
     const keyDescription = learningCaged ? 'major' : viewingTriads
       ? triadDefinition(currentScaleKey, this.state.triadType).label.toLowerCase()
       : scale ? scale.title.toLowerCase() : '';
+    const toolbar = (
+      <Toolbar
+        lessonMode={chordMode}
+        quizMode={playingNoteGame}
+        currentScale={currentScale}
+        currentScaleKey={currentScaleKey}
+        startFret={startFret}
+        totalFrets={totalFrets}
+        hasStrings={currentStrings.length > 0}
+        hasSelectedNotes={notesInScale.length > 0}
+        onScaleChange={this.setScale}
+        onKeyChange={this.changeScaleKey}
+        onClear={this.clearScale}
+        onStartFretChange={this.changeStartFret}
+        onTotalFretsChange={this.changeTotalFrets}
+        onAddString={this.addString}
+        onRemoveString={this.removeString}
+      />
+    );
 
     return (
-      <main className="App">
+      <main className={`App${playingNoteGame ? ' noteGameApp' : ''}`}>
         <header className="appHeader">
           <p className="brand">Guitar Strings</p>
           <h1>Fretboard</h1>
-          <p className="appDescription">Explore scales, connect chord shapes, and find your next phrase.</p>
+          <p className="appDescription">Explore scales, connect chord shapes, and learn the notes of your fretboard.</p>
         </header>
         <div className="viewSwitcher" role="group" aria-label="Fretboard view">
           <button type="button" aria-pressed={viewMode === 'explore'} onClick={() => this.changeView('explore')}>Explore & practice</button>
           <button type="button" aria-pressed={learningCaged} onClick={() => this.changeView('caged')}>Learn CAGED</button>
           <button type="button" aria-pressed={viewingTriads} onClick={() => this.changeView('triads')}>Triads</button>
+          <button type="button" aria-pressed={playingNoteGame} onClick={() => this.changeView('quiz')}>Note game</button>
         </div>
-        <section className="workspace" aria-label="Scale explorer">
-          <Toolbar
-            lessonMode={chordMode}
-            currentScale={currentScale}
-            currentScaleKey={currentScaleKey}
-            startFret={startFret}
-            totalFrets={totalFrets}
-            hasStrings={currentStrings.length > 0}
-            hasSelectedNotes={notesInScale.length > 0}
-            onScaleChange={this.setScale}
-            onKeyChange={this.changeScaleKey}
-            onClear={this.clearScale}
-            onStartFretChange={this.changeStartFret}
-            onTotalFretsChange={this.changeTotalFrets}
-            onAddString={this.addString}
-            onRemoveString={this.removeString}
-          />
+        <section className="workspace" aria-label={playingNoteGame ? 'Note game workspace' : 'Scale explorer'}>
+          {playingNoteGame ? (
+            <details className="quizSettings">
+              <summary>Practice settings <span>Frets {startFret}–{startFret + totalFrets - 1} · {currentStrings.length} strings</span></summary>
+              {toolbar}
+            </details>
+          ) : toolbar}
           {learningCaged && (
             <CagedLesson
               rootNote={currentScaleKey}
@@ -273,7 +285,15 @@ class App extends Component {
               onFocus={() => this.selectTriad({ triadIndex: triadSelection.index })}
             />
           )}
-          {showBoard && <React.Fragment>
+          {playingNoteGame && (
+            <NoteQuiz
+              strings={currentStrings}
+              startFret={startFret}
+              fretCount={totalFrets}
+              onTuningChange={this.changeStringTuning}
+            />
+          )}
+          {showBoard && !playingNoteGame && <React.Fragment>
             <div className="boardHeader">
               <h2>{chordMode ? 'Find the roots, then connect the chord tones' : 'Your fretboard'}</h2>
             </div>
@@ -313,7 +333,7 @@ class App extends Component {
             </div>
           </React.Fragment>}
         </section>
-        <p className="appHint">{chordMode ? 'R = root. ♭ lowers an interval; ♯ raises it. Markers show chord intervals, not finger numbers. String 1 is the top row.' : 'Choose a scale, then practice a run between two root notes. String 1 is the top row.'}</p>
+        <p className="appHint">{playingNoteGame ? 'Practice the visible frets and open strings in your current tuning. String 1 is the top row.' : chordMode ? 'R = root. ♭ lowers an interval; ♯ raises it. Markers show chord intervals, not finger numbers. String 1 is the top row.' : 'Choose a scale, then practice a run between two root notes. String 1 is the top row.'}</p>
       </main>
     );
   }

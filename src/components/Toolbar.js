@@ -30,11 +30,11 @@ export default function Toolbar({
   currentScale, currentScaleKey, startFret, totalFrets, hasStrings, hasSelectedNotes,
   onScaleChange, onKeyChange, onClear, onStartFretChange, onTotalFretsChange,
   onAddString, onRemoveString,
-  lessonMode,
+  lessonMode, quizMode,
 }) {
   return (
     <div className="toolbar" role="group" aria-label="Fretboard controls">
-      <div className="scaleControls">
+      {!quizMode && <div className="scaleControls">
         <label className="controlField keyField">
           <span className="controlLabel">Key</span>
           <select value={currentScaleKey} onChange={event => onKeyChange(event.target.value)}>
@@ -50,7 +50,7 @@ export default function Toolbar({
         </label>
         <button type="button" onClick={onClear} className="clearButton" disabled={!hasSelectedNotes && !currentScale}>Clear</button>
         </React.Fragment>}
-      </div>
+      </div>}
       <div className="neckControls">
         <Stepper label="Start fret" value={startFret} onChange={onStartFretChange} />
         <Stepper label="Total frets" value={totalFrets} onChange={onTotalFretsChange} />

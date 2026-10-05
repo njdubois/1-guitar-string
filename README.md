@@ -12,6 +12,8 @@ Choose **Learn CAGED** to see the five movable major-chord shapes in the current
 
 Choose **Triads** to view major, minor, diminished, or augmented triads in the selected key. Pick any three adjacent strings and filter by root position, first inversion, or second inversion. **Lower position** and **Higher position** move between compact, close-position voicings through fret 24. The diagram labels chord intervals, and the note list gives the exact string, fret, and note for each tone. These shapes are calculated from the current tuning; at least three strings are required. Click a note to identify it, or use **Show triad in view** after moving the fret window.
 
+Choose **Note game** to memorize the fretboard. A blank marker appears at a random position among the visible frets and open strings, with four shuffled note choices. Pick a note to turn the marker and your answer green or red; the correct note is revealed, and a new question appears automatically after one second. The game follows your current tuning, string count, and fret window, scrolls the marker into view, and avoids repeating the same position immediately. Change the fret range to focus on a part of the neck. The score counts correct answers in the current session.
+
 Above the board, the readout shows the current key, CAGED form or triad voicing, and visible fret range. Changes briefly highlight the updated values and show the previous and new selection. Changing a CAGED form keeps the same key. Moving the fret window smoothly pans the notes and both fret-number rows together, with the open strings and tuning controls fixed at the left. Reduced-motion preferences skip the animation.
 
 First, you need to have NPM installed, install NPM from here: https://www.npmjs.com/get-npm

@@ -4,6 +4,8 @@ import RunPractice from './RunPractice';
 import { pitchLabel } from '../music';
 import { buildRun, getPositions, positionKey, suggestRun } from '../runs';
 
+const EMPTY_NOTES = [];
+
 function FretLabels({ frets = [], controls = false }) {
   return (
     <div className={`aFretBoardString fretLabels${controls ? ' stringControls' : ''}`} aria-hidden="true">
@@ -34,6 +36,10 @@ export default class Fretboard extends Component {
   panFrame = null;
 
   componentDidMount() {
+    if (this.props.quiz) {
+      this.revealQuizTarget();
+      window.addEventListener('resize', this.revealQuizTarget);
+    }
     if (this.props.startWithRun) {
       const { strings, startFret, fretCount, rootNote } = this.props;
       const frets = Array.from({ length: fretCount }, (_, index) => startFret + index);
@@ -72,16 +78,33 @@ export default class Fretboard extends Component {
     } else if (previousProps.fretCount !== this.props.fretCount && this.state.pan) {
       this.finishPan();
     }
+    if (this.props.quiz && (!previousProps.quiz || positionKey(previousProps.quiz.position) !== positionKey(this.props.quiz.position))) {
+      this.revealQuizTarget();
+    }
   }
 
   componentWillUnmount() {
     window.cancelAnimationFrame(this.panFrame);
+    window.removeEventListener('resize', this.revealQuizTarget);
   }
+
+  revealQuizTarget = () => {
+    const board = this.board.current;
+    const cell = board.querySelector('[data-quiz-target="true"]');
+    if (!cell) return;
+    const cellBounds = cell.getBoundingClientRect();
+    const boardBounds = board.getBoundingClientRect();
+    if (cellBounds.left < boardBounds.left) board.scrollLeft -= boardBounds.left - cellBounds.left;
+    else if (cellBounds.right > boardBounds.right) board.scrollLeft += cellBounds.right - boardBounds.right;
+  };
 
   finishPan = () => {
     window.cancelAnimationFrame(this.panFrame);
     this.panFrame = null;
-    this.setState({ pan: null }, () => { this.board.current.scrollLeft = 0; });
+    this.setState({ pan: null }, () => {
+      this.board.current.scrollLeft = 0;
+      if (this.props.quiz) this.revealQuizTarget();
+    });
   };
 
   panToPosition = snapshot => {
@@ -165,14 +188,14 @@ export default class Fretboard extends Component {
   };
 
   render() {
-    const { strings, startFret, fretCount, notesInScale, rootNote, onNoteToggle, onTuningChange, chordDiagram } = this.props;
+    const { strings, startFret, fretCount, notesInScale, rootNote, onNoteToggle, onTuningChange, chordDiagram, quiz } = this.props;
     const { practicing, startKey, endKey, message, reversedSteps } = this.state;
     const frets = Array.from({ length: fretCount }, (_, index) => startFret + index);
     const { pan } = this.state;
     const renderedFrets = pan
       ? Array.from({ length: pan.endFret - pan.startFret + 1 }, (_, index) => pan.startFret + index)
       : frets;
-    const positions = getPositions(strings, frets, rootNote);
+    const positions = quiz ? EMPTY_NOTES : getPositions(strings, frets, rootNote);
     const start = positions.find(position => positionKey(position) === startKey && position.note === rootNote);
     const end = positions.find(position => positionKey(position) === endKey && position.note === rootNote);
     const result = buildRun(positions, notesInScale, start, end);
@@ -184,7 +207,7 @@ export default class Fretboard extends Component {
     const activeStep = Math.min(this.state.activeStep, Math.max(0, steps.length - 1));
     const rootCount = positions.filter(position => position.note === rootNote).length;
     let hint = 'Choose two root positions and follow a numbered scale run between them.';
-    if (!this.canPractice()) hint = `Choose a scale with ${rootNote.toUpperCase()} in it, or select the root and at least one other note.`;
+    if (!quiz && !this.canPractice()) hint = `Choose a scale with ${rootNote.toUpperCase()} in it, or select the root and at least one other note.`;
     else if (practicing && !rootCount) hint = 'No roots are visible. Show more frets to find a starting root.';
     else if (practicing && !start) hint = `Choose a starting ${rootNote.toUpperCase()} on the board, or try a suggested run. Outlined notes are roots.`;
     else if (practicing && !steps.length) hint = `Starting at ${pitchLabel(start.pitch)}, string ${start.stringIndex + 1}, fret ${start.fret}. Choose a root in another octave to finish.`;
@@ -212,6 +235,7 @@ export default class Fretboard extends Component {
         onRootPick={this.chooseRoot}
         onStepChange={this.changeStep}
         chordDiagram={chordDiagram}
+        quiz={quiz}
         chordNoteKey={this.state.chordNoteKey}
         onChordNotePick={position => this.setState({ chordNoteKey: positionKey(position) })}
       />
@@ -219,7 +243,7 @@ export default class Fretboard extends Component {
 
     return (
       <React.Fragment>
-        {chordDiagram ? <div className="practiceControls chordBoardLegend">
+        {!quiz && (chordDiagram ? <div className="practiceControls chordBoardLegend">
           <p className="practiceHint" aria-live="polite">
             {chordNote
               ? `${selectedTone && selectedTone.label ? selectedTone.label : pitchLabel(chordNote.pitch)} · String ${chordNote.stringIndex + 1}, fret ${chordNote.fret} · ${selectedInterval === 'R' ? 'Root: a place to resolve your phrase.' : `Interval ${selectedInterval} above the root.`}`
@@ -234,15 +258,15 @@ export default class Fretboard extends Component {
             {practicing && start && !steps.length && <button type="button" className="clearButton" onClick={this.chooseRoots}>Reset roots</button>}
           </div>
           <p className="practiceHint" aria-live="polite">{message || result.error || hint}</p>
-        </div>}
+        </div>)}
         {strings.length === 0 && <p className="emptyBoard">Add a string above to start building your fretboard.</p>}
-        <div className={`fretboardLayout${practicing ? ' practicingRun' : ''}`} role="group" aria-label="Guitar fretboard">
+        <div className={`fretboardLayout${quiz ? ' quizFretboard' : ''}${practicing ? ' practicingRun' : ''}`} role="group" aria-label="Guitar fretboard">
           <div className="fretboardControls">
             <FretLabels controls />
             {renderStrings(true)}
             <FretLabels controls />
           </div>
-          <div ref={this.board} className={`fretboard${pan ? ' fretboardPanning' : ''}`} style={pan ? { '--fret-width': `${pan.cellWidth}px` } : undefined} role="region" aria-label={`${rootNote.toUpperCase()} root, frets ${startFret} through ${startFret + fretCount - 1}`} tabIndex={0}>
+          <div ref={this.board} className={`fretboard${pan ? ' fretboardPanning' : ''}`} style={pan ? { '--fret-width': `${pan.cellWidth}px` } : undefined} role="region" aria-label={`${quiz ? 'Note game' : `${rootNote.toUpperCase()} root`}, frets ${startFret} through ${startFret + fretCount - 1}`} tabIndex={0}>
             <FretLabels frets={renderedFrets} />
             {renderStrings(false)}
             <FretLabels frets={renderedFrets} />
